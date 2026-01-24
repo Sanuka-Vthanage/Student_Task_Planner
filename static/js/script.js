@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://YOUR-BACKEND-URL.onrender.com";
+const BACKEND_URL = "https://student-task-planner-api.onrender.com";
 
 function showDashboard() {
   splashPage.style.display = "none";
