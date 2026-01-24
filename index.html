@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Task Planner</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<section id="splashPage" class="splash">
+  <div class="splash-container">
+    <h1>📚 Student Task Planner</h1>
+    <p>Manage your tasks, deadlines & goals</p>
+    <button onclick="showDashboard()">Get Started</button>
+  </div>
+</section>
+
+<section id="app" class="dashboard hidden">
+
+  <aside class="sidebar">
+    <h2>Planner</h2>
+    <ul>
+      <li onclick="showDashboard()" class="active">Dashboard</li>
+      <li onclick="showTasks()">My Tasks</li>
+      <li onclick="logout()">Logout</li>
+    </ul>
+  </aside>
+
+  <main class="content">
+
+    <div id="dashboardPage">
+      <h1>Task Management Dashboard</h1>
+      <div class="cards">
+        <div class="card">📌 Total Tasks<br><strong id="totalTasks">0</strong></div>
+        <div class="card">⏳ Pending<br><strong id="pendingTasks">0</strong></div>
+      </div>
+    </div>
+
+    <div id="tasksPage" class="hidden">
+      <h1>My Tasks</h1>
+
+      <div class="task-input">
+        <input type="text" id="taskInput" placeholder="Enter new task">
+        <button onclick="addTask()">Add Task</button>
+      </div>
+
+      <ul id="taskList"></ul>
+    </div>
+
+  </main>
+</section>
+
+<script src="new.js"></script>
+</body>
+</html>
+ 
