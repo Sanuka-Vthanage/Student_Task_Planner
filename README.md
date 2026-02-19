@@ -1,9 +1,10 @@
 Student Task Planner
 
 Group members:
-Sanuka Vithanage    - ITBIN-2313-0118
-Mulani Yohansa      - ITBIN-2312-0019
-Maleesha Godakanda  - ITBIN-2313-0069
+- Sanuka Vithanage    - ITBIN-2313-0118
+- Mulani Yohansa      - ITBIN-2312-0019
+- Maleesha Godakanda  - ITBIN-2313-0069
+
 
 Technologies used:
 
@@ -97,5 +98,6 @@ Student_Task_Planner/
 |-- requirements.txt
 |-- .gitignore
 |-- README.md
+
 
 
