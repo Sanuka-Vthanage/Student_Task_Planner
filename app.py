@@ -1,135 +1,56 @@
-import os
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Task Planner</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
 
-app = Flask(__name__, static_folder="static")
-CORS(app)
+<section id="splashPage" class="splash">
+  <div class="splash-container">
+    <h1>📚 Student Task Planner</h1>
+    <p>Manage your tasks, deadlines & goals</p>
+    <button onclick="showDashboard()">Get Started</button>
+  </div>
+</section>
 
-# Use PostgreSQL on Render (persistent), SQLite locally
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    # Render Postgres uses postgres:// but psycopg2 expects postgresql://
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+<section id="app" class="dashboard hidden">
 
-USE_POSTGRES = bool(DATABASE_URL)
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks.db")
+  <aside class="sidebar">
+    <h2>Planner</h2>
+    <ul>
+      <li onclick="showDashboard()" class="active">Dashboard</li>
+      <li onclick="showTasks()">My Tasks</li>
+      <li onclick="logout()">Logout</li>
+    </ul>
+  </aside>
 
+  <main class="content">
 
-def init_db():
-    if USE_POSTGRES:
-        import psycopg2
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-        cur.execute("""
-          CREATE TABLE IF NOT EXISTS tasks (
-            id SERIAL PRIMARY KEY,
-            title TEXT,
-            completed INTEGER DEFAULT 0
-          )
-        """)
-        conn.commit()
-        cur.close()
-        conn.close()
-    else:
-        import sqlite3
-        conn = sqlite3.connect(DB_PATH)
-        conn.execute("""
-          CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            completed INTEGER DEFAULT 0
-          )
-        """)
-        conn.commit()
-        conn.close()
+    <div id="dashboardPage">
+      <h1>Task Management Dashboard</h1>
+      <div class="cards">
+        <div class="card">📌 Total Tasks<br><strong id="totalTasks">0</strong></div>
+        <div class="card">⏳ Pending<br><strong id="pendingTasks">0</strong></div>
+      </div>
+    </div>
 
+    <div id="tasksPage" class="hidden">
+      <h1>My Tasks</h1>
 
-def get_db():
-    if USE_POSTGRES:
-        import psycopg2
-        return psycopg2.connect(DATABASE_URL)
-    else:
-        import sqlite3
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        return conn
+      <div class="task-input">
+        <input type="text" id="taskInput" placeholder="Enter new task">
+        <button onclick="addTask()">Add Task</button>
+      </div>
 
+      <ul id="taskList"></ul>
+    </div>
 
-def get_cursor(conn):
-    if USE_POSTGRES:
-        import psycopg2.extras
-        return conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    return conn.cursor()
+  </main>
+</section>
 
-
-def rows_to_list(cursor_or_rows):
-    """Convert DB rows to list of dicts for both SQLite and Postgres."""
-    if USE_POSTGRES:
-        return list(cursor_or_rows)
-    return [dict(r) for r in cursor_or_rows]
-
-
-init_db()
-
-
-@app.route("/")
-def index():
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), "index.html")
-
-
-@app.route("/tasks")
-def get_tasks():
-    conn = get_db()
-    cur = get_cursor(conn)
-    cur.execute("SELECT * FROM tasks")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return jsonify(rows_to_list(rows))
-
-
-@app.route("/add", methods=["POST"])
-def add_task():
-    data = request.get_json()
-    if not data or "title" not in data:
-        return jsonify({"error": "Missing title"}), 400
-    title = data["title"].strip()
-    conn = get_db()
-    cur = get_cursor(conn)
-    if USE_POSTGRES:
-        cur.execute("INSERT INTO tasks (title, completed) VALUES (%s, 0)", (title,))
-    else:
-        cur.execute("INSERT INTO tasks (title, completed) VALUES (?, ?)", (title, 0))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"status": "ok"})
-
-
-@app.route("/toggle/<int:task_id>", methods=["POST"])
-def toggle_task(task_id):
-    conn = get_db()
-    cur = get_cursor(conn)
-    sql = "UPDATE tasks SET completed = 1 - completed WHERE id = %s" if USE_POSTGRES else "UPDATE tasks SET completed = 1 - completed WHERE id = ?"
-    cur.execute(sql, (task_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"status": "updated"})
-
-
-@app.route("/delete/<int:task_id>", methods=["DELETE"])
-def delete_task(task_id):
-    conn = get_db()
-    cur = get_cursor(conn)
-    sql = "DELETE FROM tasks WHERE id = %s" if USE_POSTGRES else "DELETE FROM tasks WHERE id = ?"
-    cur.execute(sql, (task_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"status": "deleted"})
-
-
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+<script src="/static/js/script.js"></script>
+</body>
+</html>
+ 
