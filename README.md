@@ -99,5 +99,8 @@ Student_Task_Planner/
 |-- .gitignore
 |-- README.md
 
+Render deployment: Add a free PostgreSQL database in the Render dashboard and connect it to your web service. The app automatically uses PostgreSQL when DATABASE_URL is set.
+
+
 
 
