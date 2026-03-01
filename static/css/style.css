@@ -113,3 +113,8 @@
   margin-bottom: 10px;
   border-radius: 6px;
 }
+
+#taskList li.completed-task {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
