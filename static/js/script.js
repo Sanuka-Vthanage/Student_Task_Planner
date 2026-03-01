@@ -1,4 +1,6 @@
-const BACKEND_URL = "https://student-task-planner-api.onrender.com"; 
+const BACKEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ? window.location.origin
+  : "https://student-task-planner-api.onrender.com"; 
 
 function showDashboard() {
   document.getElementById("splashPage").style.display = "none";
@@ -19,10 +21,24 @@ function logout() {
 }
 
 async function loadTasks() {
-  const res = await fetch(`${BACKEND_URL}/tasks`);
-  const tasks = await res.json();
+  let tasks;
+  try {
+    const res = await fetch(`${BACKEND_URL}/tasks`);
+    if (!res.ok) throw new Error("Failed to load tasks");
+    tasks = await res.json();
+  } catch (err) {
+    console.error(err);
+    const totalEl = document.getElementById("totalTasks");
+    const pendingEl = document.getElementById("pendingTasks");
+    if (totalEl) totalEl.textContent = "-";
+    if (pendingEl) pendingEl.textContent = "-";
+    const list = document.getElementById("taskList");
+    if (list) list.innerHTML = "<li style='color:#dc2626'>Could not connect to server. Is the backend running?</li>";
+    return;
+  }
 
   const list = document.getElementById("taskList");
+  if (!list) return;
   list.innerHTML = "";
 
   tasks.forEach(task => {
